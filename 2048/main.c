@@ -104,6 +104,10 @@ int GenNewNumber() {
 	/****                     ****/
 	/****                     ****/
 	/*****************************/
+	double p = (double)rand() / (RAND_MAX + 1.0);
+	if (p < 0.9)
+		return 2;
+	return 4;
 }
 
 void InitBoard(int board[4][4]) {
@@ -142,6 +146,76 @@ void UpdateIthColumn(int board[4][4], int i, char a) {
 	/****                     ****/
 	/****                     ****/
 	/*****************************/
+	if ('w' == a)
+	{
+		// move up
+		int merge = 0;
+		for (int j = 1; j < 4; j++)
+		{
+			if (0 == board[j][i])
+			{
+				continue;
+			}
+			int k = j;
+			int l = j - 1;
+			while (l >= 0)
+			{
+				if (0 == board[l][i])
+				{
+					board[l][i] = board[k][i];
+					board[k][i] = 0;
+					--k;
+					--l;
+				}
+				else if (0 == merge && board[l][i] == board[k][i])
+				{
+					merge = 1;
+					board[l][i] = 2 * board[k][i];
+					board[k][i] = 0;
+					break;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	else if ('s' == a)
+	{
+		// move down
+		int merge = 0;
+		for (int j = 2; j >= 0; --j)
+		{
+			if (0 == board[j][i])
+			{
+				continue;
+			}
+			int k = j;
+			int l = j + 1;
+			while (l < 4)
+			{
+				if (0 == board[l][i])
+				{
+					board[l][i] = board[k][i];
+					board[k][i] = 0;
+					++k;
+					++l;
+				}
+				else if (0 == merge && board[l][i] == board[k][i])
+				{
+					merge = 1;
+					board[l][i] = 2 * board[k][i];
+					board[k][i] = 0;
+					break;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
 }
 
 void UpdateIthRow(int board[4][4], int i, char a) {
@@ -153,12 +227,82 @@ void UpdateIthRow(int board[4][4], int i, char a) {
 	/****                     ****/
 	/****                     ****/
 	/*****************************/
+	if ('a' == a)
+	{
+		// move left
+		int merge = 0;
+		for (int j = 1; j < 4; j++)
+		{
+			if (0 == board[i][j])
+			{
+				continue;
+			}
+			int k = j;
+			int l = j - 1;
+			while (l >= 0)
+			{
+				if (0 == board[i][l])
+				{
+					board[i][l] = board[i][k];
+					board[i][k] = 0;
+					--k;
+					--l;
+				}
+				else if (0 == merge && board[i][l] == board[i][k])
+				{
+					merge = 1;
+					board[i][l] = 2 * board[i][k];
+					board[i][k] = 0;
+					break;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	else if ('d' == a)
+	{
+		// move right
+		int merge = 0;
+		for (int j = 2; j >= 0; --j)
+		{
+			if (0 == board[i][j])
+			{
+				continue;
+			}
+			int k = j;
+			int l = j + 1;
+			while (l < 4)
+			{
+				if (0 == board[i][l])
+				{
+					board[i][l] = board[i][k];
+					board[i][k] = 0;
+					++k;
+					++l;
+				}
+				else if (0 == merge && board[i][l] == board[i][k])
+				{
+					merge = 1;
+					board[i][l] = 2 * board[i][k];
+					board[i][k] = 0;
+					break;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
 }
 
 
 int IsGameOver(int board[4][4]) {
-	return 0; //initially, simply return 0 so that the game always continues
-	
+	//return 0; //initially, simply return 0 so that the game always continues
+
 	//return 1 if the game is over
 	//return 0 otherwise
 	/*****************************/
@@ -168,6 +312,54 @@ int IsGameOver(int board[4][4]) {
 	/****                     ****/
 	/****                     ****/
 	/*****************************/
+	int over = 1;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if (0 == board[i][j])
+			{
+				over = 0;
+				break;
+			}
+			int k = i;
+			int l = j - 1;
+			if (k >= 0 && k < 4 && l >= 0 && l < 4 && board[i][j] == board[k][l])
+			{
+				over = 0;
+				break;
+			}
+
+			k = i;
+			l = j + 1;
+			if (k >= 0 && k < 4 && l >= 0 && l < 4 && board[i][j] == board[k][l])
+			{
+				over = 0;
+				break;
+			}
+
+			k = i - 1;
+			l = j;
+			if (k >= 0 && k < 4 && l >= 0 && l < 4 && board[i][j] == board[k][l])
+			{
+				over = 0;
+				break;
+			}
+
+			k = i + 1;
+			l = j;
+			if (k >= 0 && k < 4 && l >= 0 && l < 4 && board[i][j] == board[k][l])
+			{
+				over = 0;
+				break;
+			}
+		}
+		if (0 == over)
+		{
+			break;
+		}
+	}
+	return over;
 }
 
 void UpdateBoard(int board[4][4], char a) {
@@ -206,7 +398,8 @@ void AddNewNumber(int board[4][4]) {
 int main() {
 	int board[4][4];
 	int oldBoard[4][4];
-	srand(time(NULL));
+	//srand(time(NULL));
+	srand(0);
 	InitBoard(board);
 	PrintBoard(board);
 
